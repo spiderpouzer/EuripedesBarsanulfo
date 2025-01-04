@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/livros.js",
+      "use": "@vercel/node"
+    }
+  ]
+}
