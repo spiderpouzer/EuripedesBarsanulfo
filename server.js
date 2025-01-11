@@ -6,14 +6,16 @@ const path = require('path');
 
 // Configurar o app
 const app = express();
-const PORT = process.env.PORT || 10000;
-const DB_PATH = path.join(__dirname, 'livros.db');
+const PORT = process.env.PORT || 3000; // Render define a porta na variável de ambiente PORT
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// Conectar ao banco de dados
+// Caminho para o banco de dados
+const DB_PATH = path.join(__dirname, 'livros.db');
+
+// Conectar ao banco de dados SQLite
 const db = new sqlite3.Database(DB_PATH);
 
 // Rota para buscar todos os livros
@@ -49,5 +51,5 @@ app.post('/livros/:id', (req, res) => {
 
 // Iniciar o servidor
 app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
