@@ -6,7 +6,7 @@ const path = require('path');
 
 // Configurar o app
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 const DB_PATH = path.join(__dirname, 'livros.db');
 
 // Middleware
