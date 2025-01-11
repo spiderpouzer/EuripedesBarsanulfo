@@ -32,22 +32,32 @@ app.get('/livros', (req, res) => {
 
 // Rota para atualizar o status de um livro
 app.post('/livros/:id', (req, res) => {
-    const { id } = req.params;
-    const { borrowedTo } = req.body;
+    const { id } = req.params; // ID do livro
+    const { borrowedTo } = req.body; // Nome da pessoa que pegou emprestado
+
+    if (!id || !borrowedTo) {
+        res.status(400).send('ID e nome do solicitante são obrigatórios.');
+        return;
+    }
 
     db.run(
         'UPDATE livros SET borrowedTo = ? WHERE id = ?',
-        [borrowedTo || 'Disponível', id],
+        [borrowedTo, id],
         function (err) {
             if (err) {
                 console.error('Erro ao atualizar o livro:', err);
                 res.status(500).send('Erro ao atualizar o livro.');
             } else {
-                res.send('Livro atualizado com sucesso.');
+                if (this.changes > 0) {
+                    res.send('Livro atualizado com sucesso.');
+                } else {
+                    res.status(404).send('Livro não encontrado.');
+                }
             }
         }
     );
 });
+
 
 // Iniciar o servidor
 app.listen(PORT, () => {
