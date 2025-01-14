@@ -4,18 +4,15 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 
-// Configurar o app
 const app = express();
-const PORT = process.env.PORT || 3000; // Render define a porta na variável de ambiente PORT
+const PORT = process.env.PORT || 3000;
+const DB_PATH = path.join(__dirname, 'livros.db'); // Caminho para o banco de dados
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// Caminho para o banco de dados
-const DB_PATH = path.join(__dirname, 'livros.db');
-
-// Conectar ao banco de dados SQLite
+// Conectar ao banco de dados
 const db = new sqlite3.Database(DB_PATH);
 
 // Rota para buscar todos os livros
@@ -30,36 +27,33 @@ app.get('/livros', (req, res) => {
     });
 });
 
-// Rota para atualizar o status de um livro
+// Rota para atualizar o status de um livro (empréstimo ou devolução)
 app.post('/livros/:id', (req, res) => {
-    const { id } = req.params; // ID do livro
-    const { borrowedTo } = req.body; // Nome da pessoa que pegou emprestado
+    const { id } = req.params;
+    const { borrowedTo } = req.body; // Nome da pessoa que pegou o livro emprestado
 
-    if (!id || !borrowedTo) {
-        res.status(400).send('ID e nome do solicitante são obrigatórios.');
+    if (!id) {
+        res.status(400).send('ID do livro é obrigatório.');
         return;
     }
 
     db.run(
         'UPDATE livros SET borrowedTo = ? WHERE id = ?',
-        [borrowedTo, id],
+        [borrowedTo || 'Disponível', id],
         function (err) {
             if (err) {
                 console.error('Erro ao atualizar o livro:', err);
                 res.status(500).send('Erro ao atualizar o livro.');
+            } else if (this.changes > 0) {
+                res.send('Livro atualizado com sucesso.');
             } else {
-                if (this.changes > 0) {
-                    res.send('Livro atualizado com sucesso.');
-                } else {
-                    res.status(404).send('Livro não encontrado.');
-                }
+                res.status(404).send('Livro não encontrado.');
             }
         }
     );
 });
 
-
 // Iniciar o servidor
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
