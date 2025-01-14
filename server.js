@@ -30,7 +30,7 @@ app.get('/livros', (req, res) => {
 // Rota para atualizar o status de um livro (empréstimo ou devolução)
 app.post('/livros/:id', (req, res) => {
     const { id } = req.params;
-    const { borrowedTo } = req.body; // Nome da pessoa que pegou o livro emprestado
+    const { borrowedTo } = req.body;
 
     if (!id) {
         res.status(400).send('ID do livro é obrigatório.');
