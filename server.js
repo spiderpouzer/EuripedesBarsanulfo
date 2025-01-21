@@ -7,16 +7,13 @@ const fs = require('fs');
 const csv = require('csv-parser');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, 'livros.db');
 const USERS_CSV = path.join(__dirname, 'usuario.csv');
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-
-// Conectar ao banco de dados
-const db = new sqlite3.Database(DB_PATH);
 
 // Função para verificar as credenciais no arquivo CSV
 const authenticateUser = (username, password, callback) => {
