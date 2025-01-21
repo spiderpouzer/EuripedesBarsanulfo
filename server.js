@@ -7,7 +7,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 const DB_PATH = path.join(__dirname, 'livros.db');
 const USERS_CSV = path.join(__dirname, 'usuario.csv');
 
