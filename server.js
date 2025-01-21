@@ -7,7 +7,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, 'livros.db');
 const USERS_CSV = path.join(__dirname, 'usuario.csv');
 
@@ -19,11 +19,15 @@ app.use(bodyParser.json());
 const authenticateUser = (username, password, callback) => {
     console.log(`Tentando autenticar usuário: ${username}`);
     const users = [];
-
     fs.createReadStream(USERS_CSV)
         .pipe(csv())
         .on('data', (row) => {
-            users.push(row);
+            // Remove o BOM da chave 'usuario', caso exista
+            const cleanedRow = {
+                usuario: row['﻿usuario'] || row.usuario, // Corrige a chave '﻿usuario'
+                senha: row.senha,
+            };
+            users.push(cleanedRow);
         })
         .on('end', () => {
             console.log('Usuários carregados do CSV:', users);
@@ -33,11 +37,11 @@ const authenticateUser = (username, password, callback) => {
             } else {
                 console.log('Usuário ou senha inválidos para:', username);
             }
-            callback(!!user); // Retorna true se o usuário for encontrado
+            callback(!!user);
         })
         .on('error', (error) => {
             console.error('Erro ao ler o arquivo CSV:', error);
-            callback(false); // Em caso de erro, retorna falso
+            callback(false);
         });
 };
 
