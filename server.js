@@ -17,17 +17,30 @@ app.use(bodyParser.json());
 
 // Função para verificar as credenciais no arquivo CSV
 const authenticateUser = (username, password, callback) => {
+    console.log(`Tentando autenticar usuário: ${username}`);
     const users = [];
+
     fs.createReadStream(USERS_CSV)
         .pipe(csv())
         .on('data', (row) => {
             users.push(row);
         })
         .on('end', () => {
+            console.log('Usuários carregados do CSV:', users);
             const user = users.find(u => u.usuario === username && u.senha === password);
+            if (user) {
+                console.log('Usuário autenticado com sucesso:', username);
+            } else {
+                console.log('Usuário ou senha inválidos para:', username);
+            }
             callback(!!user); // Retorna true se o usuário for encontrado
+        })
+        .on('error', (error) => {
+            console.error('Erro ao ler o arquivo CSV:', error);
+            callback(false); // Em caso de erro, retorna falso
         });
 };
+
 
 // Middleware de autenticação
 const authMiddleware = (req, res, next) => {
