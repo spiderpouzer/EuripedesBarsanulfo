@@ -79,6 +79,30 @@ app.get('/livros', authMiddleware, (req, res) => {
     });
 });
 
+// Rota protegida para buscar livros por título ou autor
+app.get('/livros/search', authMiddleware, (req, res) => {
+    const { query } = req.query;
+
+    if (!query) {
+        return res.status(400).send('O parâmetro de busca é obrigatório.');
+    }
+
+    const sql = `
+        SELECT * FROM livros
+        WHERE title LIKE ? OR author LIKE ?
+    `;
+    const params = [`%${query}%`, `%${query}%`];
+
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            console.error('Erro ao buscar livros no banco de dados:', err.message);
+            return res.status(500).send('Erro ao buscar livros.');
+        }
+        res.json(rows);
+    });
+});
+
+
 // Rota protegida para atualizar o status de um livro
 app.post('/livros/:id', authMiddleware, (req, res) => {
     const { id } = req.params;
